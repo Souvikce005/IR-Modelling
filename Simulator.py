@@ -2,35 +2,36 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-#dr = k(theta - r)dt + sigma*dw
+# dr = k(theta - r)dt + sigma*dw
 
-# r(t+1) = r(t) + k(theta - r(t))*delta_t + sigma*sqrt(delta_t)*e
+# r(t+1) = r(t) + k(theta - r(t))*delta_t + sigma*sqrt(delta_t)*e - Euler Maruyama Discretization
 
-def random_generator(): 
-    e = np.random.normal(0,1)
-    return e
+def random_generator(sim_period, n_paths): 
+    shocks = np.random.default_rng(seed=42).normal(0,1, (sim_period, n_paths))
+    return shocks
 
-def simulate_paths(r0, k, theta, sigma, delta_t, sim_period):    
-    rates = []
-    rates.append(r0)
+def simulate_paths(r0, k, theta, sigma, delta_t, sim_period, n_paths):
+
+    random_shocks = random_generator(sim_period, n_paths)
+
+    rates = np.zeros((sim_period + 1, n_paths))
+    rates[0] = r0
     for i in range(sim_period): 
-        stoch_term = random_generator()
-        next_rate = rates[i] + k*(theta - rates[i])*delta_t + sigma*np.sqrt(delta_t)*stoch_term
-        print(next_rate)
-        rates.append(next_rate)
+        rates[i+1] = rates[i] + k*(theta - rates[i])*delta_t + sigma*np.sqrt(delta_t)*random_shocks[i]
     return rates
 
 def main():
-    r0 = 0.035
-    k = 0.15
-    theta = 0.04
-    sigma = 0.01
-    delta_t = 1/252
-    sim_period = 21
-    rates = simulate_paths(r0, k, theta, sigma, delta_t, sim_period)
-    print(rates)
-    plt.plot(rates)
-    plt.title('Simulated Interest Rate Paths')
+    r0 = 0.0565
+    k = 5.5
+    theta = 0.0568
+    sigma = 0.02
+    delta_t = 1/(252*24)
+    sim_period = 1000
+    n_paths = 10000
+    rates = simulate_paths(r0, k, theta, sigma, delta_t, sim_period, n_paths)
+    mean_curve = np.mean(rates, axis = 1)
+    plt.plot(mean_curve)
+    plt.title('Simulated Interest Rate Curve')
     plt.xlabel('Time Steps')
     plt.ylabel('Interest Rate')
     plt.show()
