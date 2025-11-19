@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import Calibration
 
 # dr = k(theta - r)dt + sigma*dw
 
@@ -21,12 +22,10 @@ def simulate_paths(r0, k, theta, sigma, delta_t, sim_period, n_paths):
     return rates
 
 def main():
-    r0 = 0.0565
-    k = 5.5
-    theta = 0.0568
-    sigma = 0.02
-    delta_t = 1/(252*24)
-    sim_period = 1000
+    r0 = 0.0413
+    k, theta, sigma = Calibration.calibrate_params(Calibration.rates_diff)
+    delta_t = 1/(252)
+    sim_period = 2000
     n_paths = 10000
     rates = simulate_paths(r0, k, theta, sigma, delta_t, sim_period, n_paths)
     mean_curve = np.mean(rates, axis = 1)
