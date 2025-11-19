@@ -2,10 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import Calibration
+import logging
 
 # dr = k(theta - r)dt + sigma*dw
 
 # r(t+1) = r(t) + k(theta - r(t))*delta_t + sigma*sqrt(delta_t)*e - Euler Maruyama Discretization
+
+logging.basicConfig(level=logging.INFO)
 
 def random_generator(sim_period, n_paths): 
     shocks = np.random.default_rng(seed=42).normal(0,1, (sim_period, n_paths))
